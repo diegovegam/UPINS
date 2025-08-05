@@ -1,0 +1,41 @@
+﻿@model UPINS.Models.ViewModels.AddProductRequest
+@{
+}
+
+<div class="container py-5">
+	<form method="post">
+		<div class="mb-3">
+			<label class="form-label">Nombre</label>
+			<input type="text" class="form-control" id="name" asp-for="Name" required></input>
+			<span class="text-danger" asp-validation-for="Name"></span>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Precio</label>
+			<input type="number" class="form-control" id="price" asp-for="Price" required ></input>
+			<span class="text-danger" asp-validation-for="Price"></span>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Cantidad</label>
+			<input type="number" class="form-control" id="quantity" asp-for="Quantity" required></input>
+			<span class="text-danger" asp-validation-for="Quantity"></span>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Código</label>
+			<input type="number" class="form-control" id="code" asp-for="Code" required></input>
+			<span class="text-danger" asp-validation-for="Code"></span>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Subir Imagen</label>
+			<input type="file" id="featuredImageUpload" class="form-control"></input>
+
+			<img src="" class="mt-3" id="featuredImageDisplay" style="display:none;width: 300px" />
+			<input type="hidden" class="form-control" id="featuredImageURL" asp-for="ImageUrl" value="wwwroot\Images\Products"></input>
+		</div>
+		
+
+		<div class="mb-3">
+			<button type="submit" class="btn btn-outline-dark">Guardar</button>
+		</div>
+
+	</form>
+</div>

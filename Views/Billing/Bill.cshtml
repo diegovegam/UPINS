@@ -1,0 +1,40 @@
+﻿@model UPINS.Models.ViewModels.AddProductRequest
+@{
+}
+
+
+<div class="py-5 container text-center">
+    <form method="post" asp-controller="Billing" asp-action="GenerateBill">
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+                <th scope="col">Precio</th>
+            <th scope="col">Cantidad</th>
+                <th scope="col">Total </th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+
+        @foreach (var product in Model.ProductsInCart)
+        {
+        <tr>
+            
+                <td>@product.Name</td>
+                    <td>₡@product.Price</td>
+                <td>@product.QuantityInShoppingCart</td>
+                    <td>₡@product.TotalPriceInShoppingCart</td>
+            
+            
+        </tr>
+        }
+    </tbody>
+</table>
+    <div class="d-flex justify-content-between mt-3">
+        <a class="btn btn-secondary" asp-controller="Billing" asp-action="ShoppingCart">Volver</a>
+        <button type="submit" class="btn btn-primary">Finalizar</button>
+    </div>
+    </form>
+</div>
+
+

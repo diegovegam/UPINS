@@ -1,0 +1,296 @@
+﻿@model UPINS.Models.ViewModels.AddProductRequest
+
+@{
+    int nextPage = Convert.ToInt32(ViewBag.PageNumber) + 1;
+    int prevPage = Convert.ToInt32(ViewBag.PageNumber) - 1;
+    
+}
+
+
+<form method="get" asp-controller="Billing" asp-action="ShoppingCart">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col col-md-3 d-flex">
+                <input type="text" class="form-control" name="searchQuery" value="@ViewBag.SearchQuery"></input>
+                <button type="submit" class="btn btn-secondary ms-3">Buscar</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="container py-5">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Imagen</th>
+                <th scope="col">
+                    Nombre
+                </th>
+                <th scope="col">
+                    Precio
+                </th>
+
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.code</td>
+                    <td><img src="@product.ImageUrl" class="mt-3" id="ImageDisplayList" style="display:block;width: 300px"></td>
+                    <td id="nameSource" >@product.Name</td>
+                    <td id="priceSource">₡@product.Price</td>
+                    <td>
+
+                        <a class="btn btn-warning AddProductBtn" value="@product.Id">
+                            Agregar
+                        </a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item">
+            <a class="page-link" asp-controller="Billing" asp-action="ShoppingCart"
+               asp-route-pageNumber="@prevPage" asp-route-searchQuery="@ViewBag.SearchQuery">Anterior</a>
+        </li>
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-controller="Billing" asp-action="ShoppingCart"
+                   asp-route-pageNumber="@i" asp-route-searchQuery="@ViewBag.SearchQuery">@i</a>
+            </li>
+        }
+
+        <li class="page-item">
+            <a class="page-link" asp-controller="Billing" asp-action="ShoppingCart"
+               asp-route-pageNumber="@nextPage" asp-route-searchQuery="@ViewBag.SearchQuery">Siguiente</a>
+        </li>
+    </ul>
+</nav>
+<div id="noProductDiv" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+     El producto  no puede ser agregado al carrito de compras porque ya no hay en inventario.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+<div class="container mt-5">
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">
+                        Nombre
+                    </th>
+                    <th scope="col">
+                        Precio
+                    </th>
+                    <th scope="col" style="width: 200px;">
+                        Cantidad
+                    </th>
+                    <th scope="col">
+                        Total
+                    </th>
+                    <th scope="col">
+                        Acciones
+                    </th>
+                </tr>
+
+            </thead>
+            <tbody id="product-table-body" class="table-group-divider">
+
+            </tbody>
+        </table>
+    </div>
+    <form method="get">
+    @if (Model.ProductsInCart is not null)
+    {
+ 
+    <button type="submit" class="btn btn-primary" asp-controller="Billing" asp-action="Bill">
+        Facturar
+        </button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-primary" asp-controller="Billing" asp-action="Bill" disabled>
+            Facturar
+        </button>
+    }
+    </form>
+
+ </div>
+
+ @section Scripts
+{
+    <script>
+
+            
+            document.addEventListener("DOMContentLoaded", function () {
+            // Select all buttons with the class 'AddProductBtn'
+            const addProductButtons = document.querySelectorAll('.AddProductBtn');
+
+
+            //Columns for the SC table
+            const noProductDiv = document.getElementById("noProductDiv");
+
+
+            function GetProductsFromSC()
+        {
+             return fetch('/api/ShoppingCart/GetProductsFromSC',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*'
+                }
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // log the parsed JSON
+                return data; //ensure the parsed data is returned for chaining
+            })
+            .then(products => {
+                populateProductTable(products); // Called after products are fetched
+            });
+        }
+
+                function populateProductTable(products) {
+            const tbody = document.getElementById('product-table-body');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+
+                const nameTd = document.createElement('td');
+                nameTd.textContent = product.Name
+
+                const priceTd = document.createElement('td');
+                priceTd.textContent = "₡" + product.Price;
+
+                const quantityTd = document.createElement('td');
+                        // Remove button/icon
+                const removeQuantityI = document.createElement('i');
+                removeQuantityI.classList.add('bi', 'bi-dash', 'me-2');
+                removeQuantityI.style.cursor = 'pointer'; 
+                quantityTd.appendChild(removeQuantityI);
+
+                
+                const quantitySpan = document.createElement('span');
+                quantitySpan.textContent = product.QuantityInShoppingCart;
+                quantitySpan.classList.add('mx-2'); 
+                quantityTd.appendChild(quantitySpan);
+
+                const addQuantityI = document.createElement('i');
+                addQuantityI.classList.add('bi', 'bi-plus', 'ms-2');
+                addQuantityI.style.cursor = 'pointer'; // optional styling
+                quantityTd.appendChild(addQuantityI);
+
+                const totalTd = document.createElement('td');
+                totalTd.textContent = "₡" + product.TotalPriceInShoppingCart;
+
+                //Function to addQuantityToAProductInSC
+                addQuantityI.addEventListener('click', async function () {
+
+                    fetch('/api/ShoppingCart/' + product.Id + '/AddQuantityInSC',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Content-Type': 'application/json',
+                            'Accept': '*/*'
+                        }
+                     })
+                     .then(() => GetProductsFromSC())
+                      });
+
+                      //Function to remove QuantityToAProductInSC
+                removeQuantityI.addEventListener('click', async function () {
+
+                    fetch('/api/ShoppingCart/' + product.Id + '/RemoveQuantityInSC',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Content-Type': 'application/json',
+                            'Accept': '*/*'
+                        }
+                     })
+                     .then(() => GetProductsFromSC())
+                      });
+
+                // Create Delete button
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('btn', 'btn-warning');
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.addEventListener('click', async function () {
+
+                    fetch('/api/ShoppingCart/' + product.Id + '/RemoveProductFromSC',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Content-Type': 'application/json',
+                            'Accept': '*/*'
+                        }
+                     })
+                     .then(() => GetProductsFromSC())
+                      });
+
+                const actionsTd = document.createElement('td');
+                actionsTd.appendChild(deleteButton);
+
+                row.appendChild(nameTd);
+                row.appendChild(priceTd);
+                row.appendChild(quantityTd);
+                row.appendChild(totalTd);
+                row.appendChild(actionsTd);
+                tbody.appendChild(row);
+            });
+        }
+
+            addProductButtons.forEach(button => {
+                button.addEventListener('click', async function () {
+                    const productId = this.getAttribute('value');
+                    fetch('/api/ShoppingCart/AddProductToCart',
+                    {
+                        
+                        method: 'POST',
+                        headers:
+                        {
+                            'Content-Type': 'application/json',
+                            'Accept': '*/*'
+                        },
+                        body: JSON.stringify({ProductId: productId, QuantityInSC: 1})
+                     })
+                     .then(response => {
+                        return response.json();
+                     })
+                     .then(data => {
+                        console.log(data); 
+                        
+                        if (data === false) {
+                            noProductDiv.classList.remove('d-none');
+                        }
+                        return data;
+                     })
+                     .then(() => GetProductsFromSC())
+                });
+            });
+
+            GetProductsFromSC();
+            
+        });
+     
+
+    </script>
+        
+
+}
+

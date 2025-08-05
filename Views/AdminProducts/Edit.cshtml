@@ -1,0 +1,103 @@
+﻿@model UPINS.Models.ViewModels.AddProductRequest
+@{
+}
+<div class="container py-5">
+	<form method="post">
+		<div class="mb-3">
+			<label class="form-label">Nombre</label>
+			<input type="text" class="form-control" id="name" asp-for="Name" required></input>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Precio</label>
+			<input type="number" class="form-control" id="price" asp-for="Price" required></input>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Cantidad</label>
+			<input type="number" class="form-control" id="quantity" asp-for="Quantity" required></input>
+		</div>
+		<div class="mb-3">
+			<label class="form-label">Código</label>
+			<input type="number" class="form-control" id="code" asp-for="Code" required></input>
+		</div>
+
+		<div class="mb-3">
+			<label class="form-label">Imagen</label>
+			<input type="file" id="ImageUpload" class="form-control"></input>
+
+			<img src="@Model.ImageUrl" class="mt-3" id="ImageDisplay" style="display:block;width: 200px" />
+			<input type="hidden" class="form-control" id="ImageURL" asp-for="ImageUrl" value="@Model.ImageUrl"></input>
+		</div>
+		<div>
+			<input type="hidden" asp-controller="AdminProducts" asp-action="Edit" asp-for="Id"></input>
+		</div>
+
+		<div class="mb-3">
+			<a class="btn btn-secondary" asp-controller="AdminProducts" asp-action="List">Cerrar</a>
+			<button type="submit" class="btn btn-outline-dark" asp-controller="AdminProducts" asp-action="Edit">Guardar</button>
+		</div>
+
+	</form>
+</div>
+
+@section Scripts
+{
+	<script>
+		const inputName = document.getElementById('name');
+		const inputPrice = document.getElementById('price');
+		const inputQuantity = document.getElementById('quantity');
+		const inputCode = document.getElementById('code');
+
+
+		let nameChanged = @ViewBag.Name.ToString().ToLower();
+		let priceChanged = @ViewBag.Price.ToString().ToLower();
+		let quantityChanged = @ViewBag.Quantity.ToString().ToLower();
+		let codeChanged = @ViewBag.Code.ToString().ToLower();
+
+		if(nameChanged)
+		{
+			inputName.classList.add("is-valid");
+			
+		}
+
+		if(priceChanged)
+		{
+			inputPrice.classList.add("is-valid");
+			
+		}
+
+		if(quantityChanged)
+		{
+			inputQuantity.classList.add("is-valid");
+
+		}
+
+		if(codeChanged)
+		{
+			inputCode.classList.add("is-valid");
+
+		}
+
+		const inputImageUpload = document.getElementById('ImageUpload');
+		const inputImageUrl = document.getElementById('ImageURL');
+		const inputImageDisplay = document.getElementById('ImageDisplay');
+
+
+			inputImageUpload.addEventListener('change', function() {
+			const file = this.files[0]; // Get the first selected file
+			if (file) {
+				let fileName = file.name;
+				if(inputImageUrl.value != null)
+				{
+					inputImageUrl.value = "";
+				}
+
+				let pathToTheFile = inputImageUrl.value += "\\Images\\Products\\" + fileName;
+				inputImageDisplay.src = pathToTheFile;
+				
+				console.log(inputImageDisplay.src)
+			}
+		});
+
+
+	</script>
+}

@@ -1,0 +1,123 @@
+﻿@model UPINS.Models.ViewModels.BillViewModel
+@{
+    Layout = null; // Ensures it's a clean standalone page for PDF export
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/UPINS.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <title>Factura #@Model.BillNumber</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .bill-info {
+            margin-bottom: 20px;
+        }
+
+        .bill-info p {
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .totals {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .totals p {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>UPINS Cafeteria</h1>
+        <p>Recibo</p>
+    </div>
+
+    <div class="bill-info">
+        <p><strong>Factura:</strong>#@Model.BillNumber</p>
+        <p><strong>Fecha:</strong> @Model.CreationDate.ToString("MMMM dd, yyyy")</p>
+        <p><strong>Cajero:</strong> @Model.User</p>
+        <p><strong>Productos:</strong> @Model.Quantity</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad facturada</th>
+                <th>Precio total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>₡@product.Price</td>
+                    @foreach (var bill in product.Bills)
+                    {
+                        @if(bill.BillId == Model.BillId)
+                        {
+                            <td>@bill.Quantity</td>
+                            <td>₡@(product.Price* bill.Quantity)</td>
+                        }
+                        
+                    }
+               
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p><strong>Monto total:</strong>₡@Model.Total</p>
+    </div>
+
+    <div class="mb-3 d-flex gap-2">
+        <a class="btn btn-secondary" asp-controller="AdminBills" asp-action="GetBills">Cerrar</a>
+
+        
+        <form method="post">
+        <button type="submit" class="btn btn-outline-dark" asp-controller="AdminBills" asp-action="SendBillViaEmail" asp-route-Id="@Model.Id">Enviar factura</button>
+        </form>
+	</div>
+</body>
+
+</html>
