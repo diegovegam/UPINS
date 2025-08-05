@@ -24,7 +24,7 @@ namespace UPINS.Controllers
             using var smtp = new SmtpClient("smtp.mailersend.net");
             smtp.Port = 587;
             smtp.EnableSsl = true;
-            smtp.Credentials = new NetworkCredential("MS_wu1vXn@test-65qngkdo7p3lwr12.mlsender.net", "mssp.S6gvCfD.x2p03473dyygzdrn.w0YYid3");
+            smtp.Credentials = new NetworkCredential("user", "password");
             smtp.Send(message);
         }
         public async Task GeneratePdfAndSendEmail (BillViewModel billViewModel, ControllerContext controllerContext)
